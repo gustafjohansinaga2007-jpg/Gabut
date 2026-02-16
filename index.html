@@ -1,4 +1,4 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html><!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -11,51 +11,39 @@
             background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradient 15s ease infinite;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; overflow: hidden; 
         }
-
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         .card { 
-            background: rgba(255, 255, 255, 0.15); 
-            padding: 30px; 
-            border-radius: 25px; 
+            background: rgba(255, 255, 255, 0.2); 
+            padding: 30px; border-radius: 25px; 
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2); 
-            text-align: center; 
-            max-width: 400px; 
-            width: 85%; 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            text-align: center; max-width: 400px; width: 85%; 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative; /* Menjaga tombol tetap di dalam sini */
         }
-
-        h2 { color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); margin-bottom: 25px; line-height: 1.4; }
-        .buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; }
-        
+        h2 { color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); }
+        .buttons { 
+            display: flex; flex-direction: column; gap: 15px; align-items: center; 
+            min-height: 150px; position: relative; 
+        }
         button { 
-            padding: 12px 25px; 
-            border: none; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            transition: all 0.3s;
-            width: 100%;
-            max-width: 200px;
+            padding: 12px 25px; border: none; border-radius: 50px; 
+            cursor: pointer; font-weight: bold; font-size: 16px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            width: 100%; max-width: 200px;
         }
-
-        .btn-primary { background: rgba(255, 255, 255, 0.8); color: #444; }
-        .btn-primary:hover { background: white; transform: scale(1.05); }
-        .btn-no { background-color: #ff4d4d; color: white; z-index: 999; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); }
+        .btn-primary { background: white; color: #444; }
+        .btn-no { 
+            background-color: #ff4d4d; color: white; 
+            position: absolute; /* Tombol pindah-pindah di dalam kotak kuis saja */
+            top: 60px; /* Posisi awal */
+        }
     </style>
 </head>
 <body>
@@ -79,85 +67,47 @@
                 <button class="btn-primary" onclick="nextStep('cewek')">CEWEK</button>
             `;
         } 
-        else if (choice === 'cowok') {
-            q.innerText = "Pulang aja bang, disini ga ada apa-apa kok";
-            cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
-        } 
         else if (choice === 'cewek') {
             q.innerText = "Yakin kamu cewek?";
             cont.innerHTML = `
-                <button class="btn-primary" id="btn-ya-1" onclick="nextStep('cewek-yakin')">YA</button>
+                <button class="btn-primary" onclick="nextStep('cewek-yakin')">YA</button>
                 <button class="btn-primary" onclick="nextStep('cewek-ragu')">Tidak</button>
             `;
-        } 
-        else if (choice === 'cewek-ragu') {
-            q.innerText = "Udah dibilang ga ada apa-apa kok";
-            cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
         } 
         else if (choice === 'cewek-yakin') {
             q.innerText = "Menurut kamu aku ganteng ga? hehehe";
             cont.innerHTML = `
-                <button class="btn-primary" id="btn-final-ya" onclick="nextStep('final')">Ya</button>
-                <button class="btn-no" id="moving-btn" onmouseover="moveButton()" onclick="moveButton()">Tidak</button>
+                <button class="btn-primary" id="btn-ya-final" onclick="nextStep('final')">Ya</button>
+                <button class="btn-no" id="moving-btn" onmouseover="moveButton()">Tidak</button>
             `;
         } 
         else if (choice === 'final') {
-            // EFEK HUJAN LOVE DARI ATAS
-            var duration = 5 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-            function randomInRange(min, max) {
-              return Math.random() * (max - min) + min;
-            }
-
-            var interval = setInterval(function() {
-              var timeLeft = animationEnd - Date.now();
-              if (timeLeft <= 0) { return clearInterval(interval); }
-              var particleCount = 50 * (timeLeft / duration);
-              
-              // Hujan love dari kiri dan kanan atas
-              confetti(Object.assign({}, defaults, { 
-                particleCount, 
-                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                shapes: ['heart'],
-                colors: ['#ff69b4', '#ff1493', '#ff0000']
-              }));
-              confetti(Object.assign({}, defaults, { 
-                particleCount, 
-                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                shapes: ['heart'],
-                colors: ['#ff69b4', '#ff1493', '#ff0000']
-              }));
-            }, 250);
-
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             q.innerText = "Wah makasih, kalo mau lebih lanjut tentang aku PM aja hehehe";
             cont.innerHTML = `<button class="btn-primary" onclick="alert('Ciee mau PM ya?')">Hubungi Aku</button>`;
+        }
+        else {
+            q.innerText = "Yaudah pulang aja sana!";
+            cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
         }
     }
 
     function moveButton() {
         const btnNo = document.getElementById('moving-btn');
-        const btnYes = document.getElementById('btn-final-ya');
-        const rectYes = btnYes.getBoundingClientRect();
+        const container = document.getElementById('btn-container');
         
-        let newX, newY;
-        let isOverlapping = true;
+        // Ambil ukuran kotak container
+        const pWidth = container.offsetWidth;
+        const pHeight = container.offsetHeight;
+        
+        // Acak posisi hanya di DALAM container
+        // dikurangi lebar/tinggi tombol agar tidak keluar garis
+        const newX = Math.random() * (pWidth - 100);
+        const newY = Math.random() * (pHeight - 40);
 
-        while (isOverlapping) {
-            newX = Math.random() * (window.innerWidth - btnNo.clientWidth - 50);
-            newY = Math.random() * (window.innerHeight - btnNo.clientHeight - 50);
-            const margin = 70;
-            const overlapX = newX < rectYes.right + margin && newX + btnNo.clientWidth > rectYes.left - margin;
-            const overlapY = newY < rectYes.bottom + margin && newY + btnNo.clientHeight > rectYes.top - margin;
-            if (!(overlapX && overlapY)) isOverlapping = false;
-        }
-
-        btnNo.style.position = 'fixed';
-        btnNo.style.left = newX + 'px';
-        btnNo.style.top = newY + 'px';
+        btnNo.style.left = newX + "px";
+        btnNo.style.top = newY + "px";
     }
 </script>
-
 </body>
 </html>
