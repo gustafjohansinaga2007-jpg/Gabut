@@ -25,24 +25,23 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2); 
             text-align: center; max-width: 400px; width: 85%; 
             backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18);
-            position: relative; /* Menjaga tombol tetap di dalam sini */
+            position: relative;
         }
-        h2 { color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); }
+        h2 { color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); margin-bottom: 25px; }
         .buttons { 
             display: flex; flex-direction: column; gap: 15px; align-items: center; 
-            min-height: 150px; position: relative; 
+            min-height: 120px; position: relative;
         }
         button { 
             padding: 12px 25px; border: none; border-radius: 50px; 
             cursor: pointer; font-weight: bold; font-size: 16px;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            width: 100%; max-width: 200px;
+            transition: 0.2s; width: 100%; max-width: 200px;
         }
         .btn-primary { background: white; color: #444; }
         .btn-no { 
             background-color: #ff4d4d; color: white; 
-            position: absolute; /* Tombol pindah-pindah di dalam kotak kuis saja */
-            top: 60px; /* Posisi awal */
+            position: absolute; /* Tetap di dalam kotak .buttons */
+            top: 65px;
         }
     </style>
 </head>
@@ -67,28 +66,45 @@
                 <button class="btn-primary" onclick="nextStep('cewek')">CEWEK</button>
             `;
         } 
+        else if (choice === 'cowok') {
+            q.innerText = "Pulang aja bang, disini ga ada apa-apa kok";
+            cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
+        } 
         else if (choice === 'cewek') {
             q.innerText = "Yakin kamu cewek?";
             cont.innerHTML = `
                 <button class="btn-primary" onclick="nextStep('cewek-yakin')">YA</button>
-                <button class="btn-primary" onclick="nextStep('cewek-ragu')">Tidak</button>
+                <button class="btn-primary" onclick="nextStep('cewek-tidak')">Tidak</button>
             `;
+        } 
+        else if (choice === 'cewek-tidak') {
+            q.innerText = "Udah dibilang ga ada apa-apa kok";
+            cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
         } 
         else if (choice === 'cewek-yakin') {
             q.innerText = "Menurut kamu aku ganteng ga? hehehe";
-            cont.innerHTML = `
-                <button class="btn-primary" id="btn-ya-final" onclick="nextStep('final')">Ya</button>
-                <button class="btn-no" id="moving-btn" onmouseover="moveButton()">Tidak</button>
-            `;
+            // Kosongkan dulu biar nggak double, baru isi
+            cont.innerHTML = ''; 
+            const btnYa = document.createElement('button');
+            btnYa.className = 'btn-primary';
+            btnYa.id = 'btn-ya-final';
+            btnYa.innerText = 'Ya';
+            btnYa.onclick = () => nextStep('final');
+            
+            const btnNo = document.createElement('button');
+            btnNo.className = 'btn-no';
+            btnNo.id = 'moving-btn';
+            btnNo.innerText = 'Tidak';
+            btnNo.onmouseover = moveButton;
+            btnNo.onclick = moveButton;
+
+            cont.appendChild(btnYa);
+            cont.appendChild(btnNo);
         } 
         else if (choice === 'final') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            hujanLove();
             q.innerText = "Wah makasih, kalo mau lebih lanjut tentang aku PM aja hehehe";
             cont.innerHTML = `<button class="btn-primary" onclick="alert('Ciee mau PM ya?')">Hubungi Aku</button>`;
-        }
-        else {
-            q.innerText = "Yaudah pulang aja sana!";
-            cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
         }
     }
 
@@ -96,17 +112,25 @@
         const btnNo = document.getElementById('moving-btn');
         const container = document.getElementById('btn-container');
         
-        // Ambil ukuran kotak container
+        // Batas gerak hanya di dalam kotak container
         const pWidth = container.offsetWidth;
         const pHeight = container.offsetHeight;
         
-        // Acak posisi hanya di DALAM container
-        // dikurangi lebar/tinggi tombol agar tidak keluar garis
+        // Angka 100 dan 40 adalah estimasi ukuran tombol agar tidak offset ke luar kotak
         const newX = Math.random() * (pWidth - 100);
         const newY = Math.random() * (pHeight - 40);
 
         btnNo.style.left = newX + "px";
         btnNo.style.top = newY + "px";
+    }
+
+    function hujanLove() {
+        var end = Date.now() + (5 * 1000);
+        (function frame() {
+          confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ff69b4'] });
+          confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff0000', '#ff69b4'] });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        }());
     }
 </script>
 </body>
