@@ -20,46 +20,89 @@
             100% { background-position: 0% 50%; }
         }
         .card { 
-            background: rgba(255, 255, 255, 0.2); 
-            padding: 30px; border-radius: 25px; 
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2); 
+            background: rgba(255, 255, 255, 0.25); 
+            padding: 20px 30px; border-radius: 25px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.3); 
             text-align: center; max-width: 400px; width: 85%; 
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
         }
-        h2 { color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); margin-bottom: 25px; }
+        .gif-container { min-height: 150px; display: flex; justify-content: center; align-items: center; }
+        .gif-container img {
+            width: 160px; height: 160px; border-radius: 15px; margin-bottom: 15px; object-fit: contain;
+        }
+        h2 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 25px; font-size: 1.4rem; }
         .buttons { 
             display: flex; flex-direction: column; gap: 15px; align-items: center; 
-            min-height: 120px; position: relative;
+            min-height: 150px; position: relative;
         }
         button { 
             padding: 12px 25px; border: none; border-radius: 50px; 
             cursor: pointer; font-weight: bold; font-size: 16px;
-            transition: 0.2s; width: 100%; max-width: 200px;
+            transition: 0.2s; width: 100%; max-width: 180px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .btn-primary { background: white; color: #444; }
         .btn-no { 
             background-color: #ff4d4d; color: white; 
-            position: absolute; /* Tetap di dalam kotak .buttons */
-            top: 65px;
+            position: absolute; top: 75px; z-index: 99;
         }
     </style>
 </head>
 <body>
 
+<audio id="sfx-tetot" preload="auto" crossOrigin="anonymous">
+    <source src="https://www.soundjay.com/buttons/sounds/button-10.mp3" type="audio/mpeg">
+</audio>
+<audio id="sfx-booyah" preload="auto" crossOrigin="anonymous">
+    <source src="https://files.catbox.moe/6v36vj.mp3" type="audio/mpeg">
+</audio>
+
 <div class="card" id="quiz-card">
+    <div class="gif-container" id="gif-wrap">
+        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmMwNncxcDNoeWdicG93ajJseDBzNW9heGNqNDB4Y3AyZnc4dG83ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Ij5kcfI6YwcPCN26U2/giphy.gif" alt="Hi">
+    </div>
     <h2 id="question">JUJUR YA!!!</h2>
     <div class="buttons" id="btn-container">
-        <button class="btn-primary" onclick="nextStep('mulai')">Mulai</button>
+        <button class="btn-primary" onclick="startQuiz()">Mulai</button>
     </div>
 </div>
 
 <script>
+    const sfxTetot = document.getElementById('sfx-tetot');
+    const sfxBooyah = document.getElementById('sfx-booyah');
+
+    // Browser butuh interaksi user pertama kali untuk unlock suara
+    function startQuiz() {
+        sfxTetot.play().then(() => {
+            sfxTetot.pause();
+            sfxTetot.currentTime = 0;
+        }).catch(e => console.log("Audio Unlocked"));
+        
+        nextStep('mulai');
+    }
+
+    function playTetot() {
+        sfxTetot.currentTime = 0;
+        sfxTetot.volume = 1.0;
+        let p = sfxTetot.play();
+        if (p !== undefined) { p.catch(e => {}); }
+    }
+
+    function playBooyah() {
+        sfxBooyah.currentTime = 0;
+        sfxBooyah.volume = 1.0;
+        let p = sfxBooyah.play();
+        if (p !== undefined) { p.catch(e => {}); }
+    }
+
     function nextStep(choice) {
         const q = document.getElementById('question');
         const cont = document.getElementById('btn-container');
+        const gif = document.getElementById('gif-wrap');
 
         if (choice === 'mulai') {
+            gif.innerHTML = `<img src="https://media.giphy.com/media/CaiVJuZGvR8HK/giphy.gif">`;
             q.innerText = "Kamu cowok atau cewek?";
             cont.innerHTML = `
                 <button class="btn-primary" onclick="nextStep('cowok')">COWOK</button>
@@ -67,10 +110,12 @@
             `;
         } 
         else if (choice === 'cowok') {
+            gif.innerHTML = `<img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2dnM21seWR6dWt5aDk4eHRjamxhcGkzeTFqZTVrcGhpbTJnbWNmbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IfPE0x5gfa5ctKpph6/giphy.gif">`;
             q.innerText = "Pulang aja bang, disini ga ada apa-apa kok";
             cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
         } 
         else if (choice === 'cewek') {
+            gif.innerHTML = `<img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExYm41andwOXVja3VocXh0NzJ4djhsamNldXBjd3MydjMwdzVuN3dpNiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/LR5GeZFCwDRcpG20PR/giphy.gif">`;
             q.innerText = "Yakin kamu cewek?";
             cont.innerHTML = `
                 <button class="btn-primary" onclick="nextStep('cewek-yakin')">YA</button>
@@ -78,31 +123,33 @@
             `;
         } 
         else if (choice === 'cewek-tidak') {
+            gif.innerHTML = `<img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExODk1MHpxM3J5OXlscTd1MHR1emZ3YWhpNXRkYjV0NjBmYXF3NmczNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/NAivbJDbjN9sgkLzzE/giphy.gif">`;
             q.innerText = "Udah dibilang ga ada apa-apa kok";
             cont.innerHTML = `<button class="btn-primary" onclick="location.reload()">Ulangi</button>`;
         } 
         else if (choice === 'cewek-yakin') {
+            gif.innerHTML = `<img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExb3pmZjdsdXZtOXNraGthMGoxeDhhaXo4bHRjcmVwZ280bjkzeXhzYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/vutu8xW7ByqOBKrciG/giphy.gif">`;
             q.innerText = "Menurut kamu aku ganteng ga? hehehe";
-            // Kosongkan dulu biar nggak double, baru isi
             cont.innerHTML = ''; 
+            
             const btnYa = document.createElement('button');
             btnYa.className = 'btn-primary';
-            btnYa.id = 'btn-ya-final';
             btnYa.innerText = 'Ya';
-            btnYa.onclick = () => nextStep('final');
+            btnYa.onclick = () => { playBooyah(); nextStep('final'); };
             
             const btnNo = document.createElement('button');
             btnNo.className = 'btn-no';
             btnNo.id = 'moving-btn';
             btnNo.innerText = 'Tidak';
-            btnNo.onmouseover = moveButton;
-            btnNo.onclick = moveButton;
+            btnNo.onmouseover = () => { playTetot(); moveButton(); };
+            btnNo.onclick = () => { playTetot(); moveButton(); };
 
             cont.appendChild(btnYa);
             cont.appendChild(btnNo);
         } 
         else if (choice === 'final') {
             hujanLove();
+            gif.innerHTML = `<img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXNpM3FwbWI1bWM1ZDc2Y3h0ZWM2cWYybmVvdTFuMTlhdzNocXJseSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VPY5rJLLDkbHcEv3XR/giphy.gif">`;
             q.innerText = "Wah makasih, kalo mau lebih lanjut tentang aku PM aja hehehe";
             cont.innerHTML = `<button class="btn-primary" onclick="alert('Ciee mau PM ya?')">Hubungi Aku</button>`;
         }
@@ -111,25 +158,21 @@
     function moveButton() {
         const btnNo = document.getElementById('moving-btn');
         const container = document.getElementById('btn-container');
-        
-        // Batas gerak hanya di dalam kotak container
+        if(!btnNo || !container) return;
         const pWidth = container.offsetWidth;
         const pHeight = container.offsetHeight;
-        
-        // Angka 100 dan 40 adalah estimasi ukuran tombol agar tidak offset ke luar kotak
-        const newX = Math.random() * (pWidth - 100);
+        const newX = Math.random() * (pWidth - 120);
         const newY = Math.random() * (pHeight - 40);
-
-        btnNo.style.left = newX + "px";
-        btnNo.style.top = newY + "px";
+        btnNo.style.left = Math.max(0, newX) + "px";
+        btnNo.style.top = Math.max(0, newY) + "px";
     }
 
     function hujanLove() {
-        var end = Date.now() + (5 * 1000);
+        const end = Date.now() + 5000;
         (function frame() {
-          confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ff69b4'] });
-          confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff0000', '#ff69b4'] });
-          if (Date.now() < end) requestAnimationFrame(frame);
+            confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ff69b4'] });
+            confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff0000', '#ff69b4'] });
+            if (Date.now() < end) requestAnimationFrame(frame);
         }());
     }
 </script>
