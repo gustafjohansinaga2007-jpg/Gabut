@@ -39,9 +39,10 @@
             max-width: 200px;
         }
 
-        .btn-primary { background-color: #6c757d; color: white; } /* Abu-abu sesuai flowchartmu */
+        .btn-primary { background-color: #6c757d; color: white; }
         .btn-primary:hover { background-color: #5a6268; transform: scale(1.05); }
         
+        /* Z-index tinggi supaya tombol tidak selalu di depan */
         .btn-no { background-color: #ff4d4d; color: white; z-index: 999; }
     </style>
 </head>
@@ -62,8 +63,8 @@
         if (choice === 'mulai') {
             q.innerText = "Kamu cowok atau cewek?";
             cont.innerHTML = `
-                <button class="btn-primary" onclick="nextStep('cowok')">COWOK</button>
-                <button class="btn-primary" onclick="nextStep('cewek')">CEWEK</button>
+                <button class="btn-primary" id="btn-cowok" onclick="nextStep('cowok')">COWOK</button>
+                <button class="btn-primary" id="btn-cewek" onclick="nextStep('cewek')">CEWEK</button>
             `;
         } 
         else if (choice === 'cowok') {
@@ -73,7 +74,7 @@
         else if (choice === 'cewek') {
             q.innerText = "Yakin kamu cewek?";
             cont.innerHTML = `
-                <button class="btn-primary" onclick="nextStep('cewek-yakin')">YA</button>
+                <button class="btn-primary" id="btn-ya-1" onclick="nextStep('cewek-yakin')">YA</button>
                 <button class="btn-primary" onclick="nextStep('cewek-ragu')">Tidak</button>
             `;
         } 
@@ -84,7 +85,7 @@
         else if (choice === 'cewek-yakin') {
             q.innerText = "Menurut kamu aku ganteng ga? hehehe";
             cont.innerHTML = `
-                <button class="btn-primary" onclick="nextStep('final')">Ya</button>
+                <button class="btn-primary" id="btn-final-ya" onclick="nextStep('final')">Ya</button>
                 <button class="btn-no" id="moving-btn" onmouseover="moveButton()" onclick="moveButton()">Tidak</button>
             `;
         } 
@@ -95,18 +96,35 @@
     }
 
     function moveButton() {
-        const btn = document.getElementById('moving-btn');
-        // Memberikan jarak agar tidak terlalu mepet ke pinggir layar
-        const padding = 50;
-        const x = Math.random() * (window.innerWidth - btn.clientWidth - padding);
-        const y = Math.random() * (window.innerHeight - btn.clientHeight - padding);
+        const btnNo = document.getElementById('moving-btn');
+        const btnYes = document.getElementById('btn-final-ya');
         
-        btn.style.position = 'fixed';
-        btn.style.left = x + 'px';
-        btn.style.top = y + 'px';
+        // Ambil posisi tombol "Ya" agar bisa dihindari
+        const rectYes = btnYes.getBoundingClientRect();
+        
+        let newX, newY;
+        let isOverlapping = true;
+
+        // Looping sampai ketemu posisi yang tidak menabrak tombol "Ya"
+        while (isOverlapping) {
+            newX = Math.random() * (window.innerWidth - btnNo.clientWidth - 50);
+            newY = Math.random() * (window.innerHeight - btnNo.clientHeight - 50);
+
+            // Cek tabrakan (dengan tambahan jarak aman 50px)
+            const margin = 50;
+            const overlapX = newX < rectYes.right + margin && newX + btnNo.clientWidth > rectYes.left - margin;
+            const overlapY = newY < rectYes.bottom + margin && newY + btnNo.clientHeight > rectYes.top - margin;
+
+            if (!(overlapX && overlapY)) {
+                isOverlapping = false;
+            }
+        }
+
+        btnNo.style.position = 'fixed';
+        btnNo.style.left = newX + 'px';
+        btnNo.style.top = newY + 'px';
     }
 </script>
 
 </body>
-
 </html>
