@@ -1,13 +1,16 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jujur Ya!!!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #e0e0e0; 
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -15,16 +18,27 @@
             margin: 0; 
             overflow: hidden; 
         }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         .card { 
-            background: white; 
+            background: rgba(255, 255, 255, 0.15); 
             padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            border-radius: 25px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2); 
             text-align: center; 
             max-width: 400px; 
             width: 85%; 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
-        h2 { color: #444; margin-bottom: 25px; line-height: 1.4; }
+
+        h2 { color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); margin-bottom: 25px; line-height: 1.4; }
         .buttons { display: flex; flex-direction: column; gap: 15px; align-items: center; }
         
         button { 
@@ -34,16 +48,14 @@
             cursor: pointer; 
             font-weight: bold; 
             font-size: 16px;
-            transition: transform 0.2s, background-color 0.3s;
+            transition: all 0.3s;
             width: 100%;
             max-width: 200px;
         }
 
-        .btn-primary { background-color: #6c757d; color: white; }
-        .btn-primary:hover { background-color: #5a6268; transform: scale(1.05); }
-        
-        /* Z-index tinggi supaya tombol tidak selalu di depan */
-        .btn-no { background-color: #ff4d4d; color: white; z-index: 999; }
+        .btn-primary { background: rgba(255, 255, 255, 0.8); color: #444; }
+        .btn-primary:hover { background: white; transform: scale(1.05); }
+        .btn-no { background-color: #ff4d4d; color: white; z-index: 999; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3); }
     </style>
 </head>
 <body>
@@ -63,8 +75,8 @@
         if (choice === 'mulai') {
             q.innerText = "Kamu cowok atau cewek?";
             cont.innerHTML = `
-                <button class="btn-primary" id="btn-cowok" onclick="nextStep('cowok')">COWOK</button>
-                <button class="btn-primary" id="btn-cewek" onclick="nextStep('cewek')">CEWEK</button>
+                <button class="btn-primary" onclick="nextStep('cowok')">COWOK</button>
+                <button class="btn-primary" onclick="nextStep('cewek')">CEWEK</button>
             `;
         } 
         else if (choice === 'cowok') {
@@ -90,6 +102,35 @@
             `;
         } 
         else if (choice === 'final') {
+            // EFEK HUJAN LOVE DARI ATAS
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+              if (timeLeft <= 0) { return clearInterval(interval); }
+              var particleCount = 50 * (timeLeft / duration);
+              
+              // Hujan love dari kiri dan kanan atas
+              confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                shapes: ['heart'],
+                colors: ['#ff69b4', '#ff1493', '#ff0000']
+              }));
+              confetti(Object.assign({}, defaults, { 
+                particleCount, 
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                shapes: ['heart'],
+                colors: ['#ff69b4', '#ff1493', '#ff0000']
+              }));
+            }, 250);
+
             q.innerText = "Wah makasih, kalo mau lebih lanjut tentang aku PM aja hehehe";
             cont.innerHTML = `<button class="btn-primary" onclick="alert('Ciee mau PM ya?')">Hubungi Aku</button>`;
         }
@@ -98,26 +139,18 @@
     function moveButton() {
         const btnNo = document.getElementById('moving-btn');
         const btnYes = document.getElementById('btn-final-ya');
-        
-        // Ambil posisi tombol "Ya" agar bisa dihindari
         const rectYes = btnYes.getBoundingClientRect();
         
         let newX, newY;
         let isOverlapping = true;
 
-        // Looping sampai ketemu posisi yang tidak menabrak tombol "Ya"
         while (isOverlapping) {
             newX = Math.random() * (window.innerWidth - btnNo.clientWidth - 50);
             newY = Math.random() * (window.innerHeight - btnNo.clientHeight - 50);
-
-            // Cek tabrakan (dengan tambahan jarak aman 50px)
-            const margin = 50;
+            const margin = 70;
             const overlapX = newX < rectYes.right + margin && newX + btnNo.clientWidth > rectYes.left - margin;
             const overlapY = newY < rectYes.bottom + margin && newY + btnNo.clientHeight > rectYes.top - margin;
-
-            if (!(overlapX && overlapY)) {
-                isOverlapping = false;
-            }
+            if (!(overlapX && overlapY)) isOverlapping = false;
         }
 
         btnNo.style.position = 'fixed';
